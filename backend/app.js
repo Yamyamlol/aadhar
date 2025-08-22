@@ -6,7 +6,12 @@ import twilio from "twilio";
 import dotenv from "dotenv";
 dotenv.config(); // <- Load .env first
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
+// Parse allowed origins and clean them
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map((origin) =>
+      origin.trim().replace(/\/$/, "")
+    )
+  : [];
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const verifySid = process.env.TWILIO_VERIFY_SID;
@@ -14,22 +19,37 @@ const client = twilio(accountSid, authToken);
 
 const app = express();
 
+// Enhanced CORS configuration
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (Postman, curl)
+      console.log("🔍 Request origin:", origin);
+      console.log("🔍 Allowed origins:", allowedOrigins);
+
+      // Allow requests with no origin (mobile apps, Postman, curl, etc.)
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg = `The CORS policy for this site does not allow access from the specified Origin.`;
-        return callback(new Error(msg), false);
+      // Check if origin is in allowed list
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
       }
 
-      return callback(null, true);
+      // For development, be more lenient
+      if (process.env.NODE_ENV !== "production") {
+        console.log("⚠️ Development mode: allowing origin", origin);
+        return callback(null, true);
+      }
+
+      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+      console.error("❌ CORS blocked:", msg);
+      return callback(new Error(msg), false);
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
+
 // Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -149,8 +169,12 @@ app.post("/verify-otp", async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("🚀 Server running on http://localhost:5000");
-  console.log("🧪 Test endpoint: http://localhost:5000/test");
+// Use PORT from environment or fallback to 3000
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🧪 Test endpoint: http://localhost:${PORT}/test`);
   console.log("🔧 Allowed origins:", allowedOrigins);
+  console.log("🌍 Environment:", process.env.NODE_ENV || "development");
 });
