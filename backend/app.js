@@ -6,12 +6,7 @@ import twilio from "twilio";
 import dotenv from "dotenv";
 dotenv.config(); // <- Load .env first
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
-  "http://localhost:3000",
-];
-
+const allowedOrigins = process.env.allowedOrigins
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const verifySid = process.env.TWILIO_VERIFY_SID;
