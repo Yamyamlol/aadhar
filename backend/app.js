@@ -6,7 +6,7 @@ import twilio from "twilio";
 import dotenv from "dotenv";
 dotenv.config(); // <- Load .env first
 
-const allowedOrigins = process.env.allowedOrigins
+const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const verifySid = process.env.TWILIO_VERIFY_SID;
@@ -14,7 +14,22 @@ const client = twilio(accountSid, authToken);
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (Postman, curl)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = `The CORS policy for this site does not allow access from the specified Origin.`;
+        return callback(new Error(msg), false);
+      }
+
+      return callback(null, true);
+    },
+    credentials: true,
+  })
+);
 // Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
