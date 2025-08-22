@@ -1,16 +1,14 @@
-import mongoose from "mongoose";
-import dotenv from "dotenv";
-import User from "../models/userSchema.js";
+import mongoose from "mongoose"
+import User from "../models/userSchema.js"
+import dotenv from "dotenv"
 
 dotenv.config();
 
-const MONGO_URI =
-  process.env.MONGO_URL_LOCAL || "mongodb://127.0.0.1:27017/aadharDB";
+const MONGO_URI = "mongodb://127.0.0.1:27017/aadharDB"
 
-mongoose
-  .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("✅ Connected to aadharDB"))
-  .catch((err) => console.log("❌ MongoDB error:", err));
+mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("Connected to aadharDB"))
+  .catch(err => console.log(err))
 
 const mockUsers = [
   { aadhaar: "123456789012", mobile: "9876543210" },
@@ -22,18 +20,18 @@ const mockUsers = [
   { aadhaar: "789012345678", mobile: "8123456709" },
   { aadhaar: "890123456789", mobile: "7012345678" },
   { aadhaar: "901234567890", mobile: "6213456789" },
-  { aadhaar: "112233445566", mobile: "9988776655" },
-];
+  { aadhaar: "112233445566", mobile: "9988776655" }
+]
 
 async function initDB() {
   try {
-    await User.deleteMany({});
-    await User.insertMany(mockUsers);
-    console.log("✅ aadharDB → users collection initialized with 10 entries");
-    mongoose.connection.close();
+    await User.deleteMany({})
+    await User.insertMany(mockUsers)
+    console.log("aadharDB → users collection initialized with 10 entries")
+    mongoose.connection.close()
   } catch (err) {
-    console.error("❌ Seed error:", err);
+    console.error(err)
   }
 }
 
-initDB();
+initDB()
