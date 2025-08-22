@@ -40,9 +40,12 @@ const AadhaarVerification = () => {
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:3000/send-otp", {
-        aadhaar: aadhaarNumber,
-      });
+      const response = await axios.post(
+        "https://aadhar-uc3d.onrender.com/send-otp",
+        {
+          aadhaar: aadhaarNumber,
+        }
+      );
 
       const result = response.data;
 
@@ -77,9 +80,12 @@ const AadhaarVerification = () => {
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:3000/verify-otp", {
-        otp,
-      });
+      const response = await axios.post(
+        "https://aadhar-uc3d.onrender.com/verify-otp",
+        {
+          otp,
+        }
+      );
 
       const result = response.data;
 
