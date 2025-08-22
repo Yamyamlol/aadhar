@@ -3,6 +3,8 @@ import cors from "cors";
 import mongoose from "mongoose";
 import User from "./models/userSchema.js";
 import twilio from "twilio";
+import dotenv from "dotenv";
+dotenv.config(); // <- Load .env first
 
 const allowedOrigins = [
   "http://localhost:5173",
@@ -10,9 +12,9 @@ const allowedOrigins = [
   "http://localhost:3000",
 ];
 
-const accountSid = "AC3ae113970980c632d798e4f376cc18e7";
-const authToken = "e22d5ebdebe892a03f5df2c7d26a9ba2";
-const verifySid = "VA6d83b75e7dab6c066d65cc37a6be0c8e";
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const verifySid = process.env.TWILIO_VERIFY_SID;
 const client = twilio(accountSid, authToken);
 
 const app = express();
@@ -23,8 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // MongoDB connection
-const MONGO_URL =
-  "mongodb+srv://aadharDB:wEXQYsKtPYnaj7yT@aadhardb.wxmekmu.mongodb.net/aadharDB?retryWrites=true&w=majority&appName=aadharDB";
+const MONGO_URL = process.env.MONGO_URL;
 
 mongoose
   .connect(MONGO_URL)
@@ -35,9 +36,7 @@ let mobileCache = "";
 
 // Test endpoint to verify server is working
 app.get("/test", (req, res) => {
-  console.log(
-    "api hit"
-  )
+  console.log("api hit");
   res.json({ message: "Server is working!", timestamp: new Date() });
 });
 

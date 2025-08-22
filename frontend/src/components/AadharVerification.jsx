@@ -41,7 +41,7 @@ const AadhaarVerification = () => {
 
     try {
       const response = await axios.post(
-        "https://aadhar-uc3d.onrender.com/send-otp",
+        "http://localhost:3000/send-otp",
         {
           aadhaar: aadhaarNumber,
         }
@@ -81,7 +81,7 @@ const AadhaarVerification = () => {
 
     try {
       const response = await axios.post(
-        "https://aadhar-uc3d.onrender.com/verify-otp",
+        "http://localhost:3000/verify-otp",
         {
           otp,
         }
